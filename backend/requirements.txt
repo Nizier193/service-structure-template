@@ -1,0 +1,9 @@
+pydantic-settings
+fastapi
+pydantic[email]
+requests
+uvicorn
+python-multipart
+
+psycopg2
+sqlalchemy

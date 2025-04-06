@@ -1,0 +1,54 @@
+services:
+  streamlit-visualization:
+    build: ./streamlit-visualization
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    networks:
+      - app-network
+    volumes:
+      - ./streamlit-visualization/app:/app/app
+
+  backend:
+    build: ./backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    networks:
+      - app-network
+    volumes:
+      - ./backend/app:/app/app
+
+  telegram-bot:
+    build: ./telegram-bot
+    env_file:
+      - .env
+    networks:
+      - app-network
+    volumes:
+      - ./telegram-bot/app:/app/app
+    restart: always
+
+  postgres:
+    image: postgres:13
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: prod
+      POSTGRES_PASSWORD: prod
+      POSTGRES_DB: prod 
+    networks:
+      - app-network
+    ports:
+      - "5432:5432"
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

@@ -1,0 +1,4 @@
+requests
+pytelegrambotapi
+pydantic
+pydantic-settings
