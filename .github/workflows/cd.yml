@@ -1,0 +1,14 @@
+on:
+    push:
+        branches: [master]
+
+# В CD тест и деплой приложения
+jobs:
+    job-test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: test
+              run: echo Testing...
+        
+            - name: deploy
+              run: echo Deploying...

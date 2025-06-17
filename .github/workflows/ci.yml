@@ -2,12 +2,13 @@ on:
     push:
         branches: [master]
 
+# В CI тест и билд приложения
 jobs:
-    test-job:
+    job-build:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code.
               uses: actions/checkout@v4
 
-            - name: Some test.
-              run: echo Test!
+            - name: build mock
+              run: echo Build mock!
