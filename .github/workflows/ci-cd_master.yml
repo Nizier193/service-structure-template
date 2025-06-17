@@ -54,8 +54,8 @@ jobs:
 
               # Отправляем в девелоп с тегом 
               tags: |
-                ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}/${{ matrix.service }}:develop
-                ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}/${{ matrix.service }}:develop-${{ github.sha }}
+                ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-${{ matrix.service }}:develop
+                ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-${{ matrix.service }}:develop-${{ github.sha }}
 
     # Тестируем контейнеры из девелопа
     job-test:
@@ -74,9 +74,9 @@ jobs:
 
           - name: Docker pull from develop.
             run: |
-              docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}/backend:develop-${{ github.sha }}
-              docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}/telegram-bot:develop-${{ github.sha }}
-              docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}/streamlit-visualization:develop-${{ github.sha }}
+              docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-backend:develop-${{ github.sha }}
+              docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-telegram-bot:develop-${{ github.sha }}
+              docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-streamlit-visualization:develop-${{ github.sha }}
 
           - name: Start containers for testing
             run: docker compose up -d
@@ -124,13 +124,13 @@ jobs:
           
           # Достаём контейнеры из регистри
           - name: Pulling container ${{ matrix.service }}
-            run: docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}/${{ matrix.service }}:develop-${{ github.sha }}
+            run: docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-${{ matrix.service }}:develop-${{ github.sha }}
           
           # Делаем ретаг и радуемся жизни
           - name: Retagging container ${{ matrix.service }}
             run: |
-              docker tag ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}/${{ matrix.service }}:develop-${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}/${{ matrix.service }}:latest
-              docker push ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}/${{ matrix.service }}:latest
+              docker tag ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-${{ matrix.service }}:develop-${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}/${{ matrix.service }}:latest
+              docker push ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-${{ matrix.service }}:latest
 
     
     # job-deploy:
