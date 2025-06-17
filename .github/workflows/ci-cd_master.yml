@@ -10,14 +10,14 @@ jobs:
           - name: Checkout code.
             uses: actions/checkout@v4
 
-          - name: build mock
+          - name: Building service.
             run: echo Build mock!
 
     job-test:
         needs: job-build
         runs-on: ubuntu-latest
         steps:
-          - name: Run tests
+          - name: Run tests.
             run: echo Running tests...
            
     job-deploy:
@@ -26,7 +26,7 @@ jobs:
           - job-build
         runs-on: ubuntu-latest
         steps:
-          - name: Deploy service
+          - name: Deploy service.
             run: echo Deploying...
 
     job-ok:
@@ -34,5 +34,5 @@ jobs:
           - job-deploy
         runs-on: ubuntu-latest
         steps:
-          - name: Check
-            run: echo I`m fine =)
+          - name: Check.
+            run: echo i am fine
