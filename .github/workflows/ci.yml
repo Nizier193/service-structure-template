@@ -10,4 +10,4 @@ jobs:
               uses: actions/checkout@v4
 
             - name: Some test.
-              run: Test!
+              run: echo Test!
