@@ -3,7 +3,7 @@ from fastapi.routing import APIRouter
 
 router = APIRouter()
 
-@router.get("/")
+@router.get("/ping")
 def ping():
     return JSONResponse(
         content={"status": "Server is online"},
