@@ -1,0 +1,38 @@
+on:
+    push:
+        branches: [master]
+
+
+jobs:
+    job-build:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout code.
+            uses: actions/checkout@v4
+
+          - name: build mock
+            run: echo Build mock!
+
+    job-test:
+        needs: job-build
+        runs-on: ubuntu-latest
+        steps:
+          - name: Run tests
+            run: echo Running tests...
+           
+    job-deploy:
+        needs:
+          - job-test
+          - job-build
+        runs-on: ubuntu-latest
+        steps:
+          - name: Deploy service
+            run: echo Deploying...
+
+    job-ok:
+        needs:
+          - job-deploy
+        runs-on: ubuntu-latest
+        steps:
+          - name: Check
+            run: echo I`m fine =)
