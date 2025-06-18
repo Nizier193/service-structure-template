@@ -1,6 +1,6 @@
 services:
   streamlit-visualization:
-    image: nizier193/sst-streamlit-visualization:latest
+    image: ${DOCKER_USERNAME}/${DOCKER_PREFIX}-streamlit-visualization:${TAG}
     ports:
       - "8501:8501"
     env_file:
@@ -9,7 +9,7 @@ services:
       - app-network
 
   backend:
-    image: nizier193/sst-backend:latest
+    image: ${DOCKER_USERNAME}/${DOCKER_PREFIX}-backend:${TAG}
     ports:
       - "8080:8080"
     env_file:
@@ -18,7 +18,7 @@ services:
       - app-network
 
   telegram-bot:
-    image: nizier193/sst-telegram-bot:latest
+    image: ${DOCKER_USERNAME}/${DOCKER_PREFIX}-telegram-bot:${TAG}
     env_file:
       - .env
     networks:

@@ -78,9 +78,13 @@ jobs:
               docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-telegram-bot:develop-${{ github.sha }}
               docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-streamlit-visualization:develop-${{ github.sha }}
 
+          # С префиксом, юзернеймом и тегом
           - name: Start containers for testing
             run: |
               cp .env.example .env
+              export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+              export DOCKER_PREFIX=${{ vars.DOCKER_CI_TAG }}
+              export TAG=develop-${{ github.sha }}
               docker compose -f docker-compose-ci.yaml up -d
 
           # Подготавливаем питон
