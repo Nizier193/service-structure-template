@@ -79,7 +79,7 @@ jobs:
               docker pull ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-streamlit-visualization:develop-${{ github.sha }}
 
           - name: Start containers for testing
-            run: docker compose up -d
+            run: docker compose -f docker-compose-ci.yaml up -d
 
           # Подготавливаем питон
           - name: Set up Python

@@ -1,6 +1,6 @@
 services:
   streamlit-visualization:
-    image: nizier193/service-structure-template/streamlit-visualization:latest
+    image: nizier193/sst-streamlit-visualization:latest
     ports:
       - "8501:8501"
     env_file:
@@ -9,7 +9,7 @@ services:
       - app-network
 
   backend:
-    image: nizier193/service-structure-template/backend:latest
+    image: nizier193/sst-backend:latest
     ports:
       - "8080:8080"
     env_file:
@@ -18,7 +18,7 @@ services:
       - app-network
 
   telegram-bot:
-    image: nizier193/service-structure-template/telegram-bot:latest
+    image: nizier193/sst-telegram-bot:latest
     env_file:
       - .env
     networks:
