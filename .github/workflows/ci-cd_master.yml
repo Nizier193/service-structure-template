@@ -103,7 +103,7 @@ jobs:
               echo [x] Running e2e tests.
               pytest ./tests/e2e
 
-    # Делаем деплой
+    # Делаем ретаг для деплоя если контейнеры прошли тест
     job-retag:
         needs:
           - job-test
@@ -135,7 +135,7 @@ jobs:
           # Делаем ретаг и радуемся жизни
           - name: Retagging container ${{ matrix.service }}
             run: |
-              docker tag ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-${{ matrix.service }}:develop-${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}/${{ matrix.service }}:latest
+              docker tag ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-${{ matrix.service }}:develop-${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-${{ matrix.service }}:latest
               docker push ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-${{ matrix.service }}:latest
 
     
