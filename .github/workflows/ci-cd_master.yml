@@ -105,6 +105,8 @@ jobs:
 
     # Делаем ретаг для деплоя если контейнеры прошли тест
     job-retag:
+        # Делаем ретаг только в мастере
+        if: github.ref == 'refs/heads/master'
         needs:
           - job-test
           - job-build
@@ -138,20 +140,53 @@ jobs:
               docker tag ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-${{ matrix.service }}:develop-${{ github.sha }} ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-${{ matrix.service }}:latest
               docker push ${{ secrets.DOCKER_USERNAME }}/${{ vars.DOCKER_CI_TAG }}-${{ matrix.service }}:latest
 
-    
-    # job-deploy:
-    #   needs: job-retag
-    #   runs-on: ubuntu-latest
-    #   steps:
-    #     - name: Docker login
-    #       uses: docker/login-action@v2
-    #       with:
-    #         username: ${{ secrets.DOCKER_USERNAME }}
-    #         password: ${{ secrets.DOCKER_TOKEN }}
+    # Здесь деплоим приложение на сервер с использованием последних имаджей
+    job-deploy:
+      needs: job-retag
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
 
-    #     # Получаем репу
-    #     - name: Checkout code.
-    #       uses: actions/checkout@v4
+        # Подключение к машине
+        - name: Pull containers
+          uses: appleboy/ssh-action@master
+          with:
+            host: ${{ secrets.HOST }}
+            username: ${{ secrets.USERNAME }}
+            key: ${{ secrets.SSH_KEY }}
+            script: |
+              mkdir -p /root/${{ vars.DOCKER_CI_TAG }}
+              cd /root/${{ vars.DOCKER_CI_TAG }}
 
-    #     - name: Start all services.
-    #       run: docker compose -f docker-compose-ci.yaml up -d
+              # Если нет репозитория, копируем его с docker-compose и .env.example
+              if [ ! -d ".git" ]; then
+                git clone https://github.com/${{ github.repository }} .
+              else
+                git fetch origin
+                git reset --hard origin/master
+              fi
+
+              # Создаём .env из .env.example
+              if [ ! -f .env ]; then
+                cp .env.example .env
+              fi
+
+
+        - name: Run containers
+          uses: appleboy/ssh-action@master
+          with:
+            host: ${{ secrets.HOST }}
+            username: ${{ secrets.USERNAME }}
+            key: ${{ secrets.SSH_KEY }}
+            script: |
+              cd /root/${{ vars.DOCKER_CI_TAG }}
+
+              # Устанавливаем переменные для docker-compose-ci.yaml
+              export DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}
+              export DOCKER_PREFIX=${{ vars.DOCKER_CI_TAG }}
+              export TAG=develop-${{ github.sha }}
+
+              # Пуллим свежие коробки
+              docker compose -f docker-compose-ci.yaml pull
+              docker compose -f docker-compose-ci.yaml up -d
