@@ -32,6 +32,18 @@
 - docker-compose-ci.yaml под автоматическую сборку с помощью CI/CD пайплайна
 - docker-compose.yaml под сборку локально, для локальных тестов
 
+## Github Actions
+
+Для работы CI/CD нужно в GitHub Actions создать переменнные
+
+<img src="media/secrets.jpg" width=50% alt="Секретные переменные">
+
+- Переменные секретные (SSH_KEY, DOCKER_USERNAME, PASSWORD, etc.)
+
+<img src="media/vars.jpg" width=50% alt="Общие переменные">
+
+- Общие переменные (для репы, например)
+
 ## TODO List
 
 [x] - Сделать рабочий шаблон
