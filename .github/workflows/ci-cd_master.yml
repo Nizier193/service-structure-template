@@ -188,5 +188,5 @@ jobs:
               export TAG=develop-${{ github.sha }}
 
               # Пуллим свежие коробки
-              docker compose -f docker-compose-ci.yaml pull
-              docker compose -f docker-compose-ci.yaml up -d
+              docker compose -f docker-compose-ci.yaml down
+              docker compose -f docker-compose-ci.yaml up -d --build
