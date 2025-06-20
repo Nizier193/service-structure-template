@@ -2,11 +2,11 @@
 
 Шаблон в базовой комплектации с:
 
-- Streamlit site
-- Backend
-- Telegram Bot
+- **[Streamlit](streamlit-visualization/README.md)**
+- **[Backend](backend/README.md)**
+- **[Telegram bot](telegram-bot/README.md)**
 - PostgresDB
-- CI/CD
+- **[CI/CD](.github/workflows/ci-cd_master.yml)**
 
 Остальные прибамбасы:
 
