@@ -4,6 +4,7 @@ pydantic[email]
 requests
 uvicorn
 python-multipart
+redis
 
 psycopg2
 sqlalchemy

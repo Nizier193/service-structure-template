@@ -7,6 +7,9 @@ class Config(BaseSettings):
     HOST: str
     PORT: int
 
+    CACHE_HOST: str
+    CACHE_PORT: int
+
     DATABASE_URI: str
 
     class Config:

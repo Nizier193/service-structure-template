@@ -29,7 +29,7 @@ class PingRepository():
 
 
     # В качестве ID - UUID4
-    def get_ping_by_id(self, id: str) -> Optional[Dict]:
+    def get_ping_by_id(self, id: str) -> Optional[dict]:
         ping = (
             self.db.query(PingConnectionsORM)
             .filter(PingConnectionsORM.id == id)
