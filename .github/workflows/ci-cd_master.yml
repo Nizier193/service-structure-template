@@ -161,7 +161,7 @@ jobs:
 
               # Если нет репозитория, копируем его с docker-compose и .env.example
               if [ ! -d ".git" ]; then
-                git clone https://github.com/${{ github.repository }} .
+                git clone https://${{ secrets.GHP_PAT }}@github.com/${{ github.repository }} .
               else
                 git fetch origin
                 git reset --hard origin/master

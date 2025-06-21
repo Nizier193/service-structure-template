@@ -38,6 +38,8 @@
 
 <img src="media/secrets.jpg" width=50% alt="Секретные переменные">
 
+- Добавлена переменная GHP_PAT для приватных репозиториев!
+
 - Переменные секретные (SSH_KEY, DOCKER_USERNAME, PASSWORD, etc.)
 
 <img src="media/vars.jpg" width=50% alt="Общие переменные">
