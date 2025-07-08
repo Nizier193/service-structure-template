@@ -4,7 +4,7 @@
 
 on:
     push:
-        branches: [] # Не используется сейчас
+        branches: [none] # Не используется сейчас
 
 
 jobs:
