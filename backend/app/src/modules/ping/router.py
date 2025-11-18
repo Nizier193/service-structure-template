@@ -2,8 +2,8 @@ from fastapi import Body, Depends, Query
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRouter
 
-from redis import Redis
-from sqlalchemy.orm import Session
+from redis.asyncio import Redis
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.cache import get_cache
 from core.database import get_db
@@ -11,18 +11,22 @@ from core.database import get_db
 from .repository import PingRepository
 from .service import PingService
 
+# Логгер
+import logging
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
 @router.get("/ping")
-def ping(
-    db: Session = Depends(get_db),
+async def ping(
+    db: AsyncSession = Depends(get_db),
     cache: Redis = Depends(get_cache)
 ):
     repository = PingRepository(db)
     service = PingService(cache)
 
-    model = repository.insert_ping()
-    service.set_ping(str(model.id))
+    model = await repository.insert_ping()
+    await service.set_ping(str(model.id))
 
     return JSONResponse(
         content={
@@ -34,16 +38,16 @@ def ping(
 
 
 @router.get("/ping/single/{ping_id}")
-def get_ping(
+async def get_ping(
     ping_id: str,
-    db: Session = Depends(get_db),
+    db: AsyncSession = Depends(get_db),
     cache: Redis = Depends(get_cache)
 ):
     repository = PingRepository(db)
     service = PingService(cache)
 
-    ping = repository.get_ping_by_id(ping_id)
-    cache_ping = service.get_ping(ping_id)
+    ping = await repository.get_ping_by_id(ping_id)
+    cache_ping = await service.get_ping(ping_id)
 
     if not ping:
         return JSONResponse(
@@ -60,13 +64,13 @@ def get_ping(
 
 
 @router.get("/ping/list")
-def get_ping_paginated(
+async def get_ping_paginated(
     size: int = Query(default=10e10, gt=0),
     page: int = Query(default=1, gt=0),
-    db: Session = Depends(get_db)
+    db: AsyncSession = Depends(get_db)
 ):
     repository = PingRepository(db)
-    result = repository.get_ping_paginated(size, page)
+    result = await repository.get_ping_paginated(size, page)
 
     return JSONResponse(
         content=result,

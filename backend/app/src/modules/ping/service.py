@@ -1,19 +1,22 @@
-# Module service logic there
-
 from typing import Optional
-from redis import Redis
+from redis.asyncio import Redis
 
-class PingService():
+class PingService:
     def __init__(self, cache: Redis) -> None:
         self.cache = cache
 
-    def set_ping(self, id: str):
-        self.cache.setex(id, 100, f"Ping №{id}")
+    async def set_ping(self, id: str):
+        await self.cache.setex(
+            name=f"ping:{id}",
+            time=100,
+            value=f"Ping №{id}"
+        )
     
-    def get_ping(self, id: str) -> Optional[str]:
-        result: bytes = self.cache.getex(id)
-
+    async def get_ping(self, id: str) -> Optional[str]:
+        """Достаём пинг из кеша"""
+        result = await self.cache.get(f"ping:{id}")
+        
         if not result:
             return None
         
-        return result.decode("utf-8")
+        return result 
