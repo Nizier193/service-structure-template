@@ -12,6 +12,7 @@ cache:
   paths:
     - .cache/pip
 
+
 .python_template: &python_template
   image: python:3.11
   before_script:
