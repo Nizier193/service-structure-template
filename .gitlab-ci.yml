@@ -1,0 +1,131 @@
+stages:
+  - build
+  - test
+  - e2e
+  - docker-build
+  - deploy
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - .cache/pip
+
+.python_template: &python_template
+  image: python:3.11
+  before_script:
+    - python -m pip install --upgrade pip
+    - |
+      # Устанавливаем зависимости на основе результатов анализа (analysis.dependency_files)
+      echo "Installing dependencies from backend/requirements.txt"
+      pip install -r "backend/requirements.txt"
+      echo "Installing dependencies from streamlit-visualization/requirements.txt"
+      pip install -r "streamlit-visualization/requirements.txt"
+      echo "Installing dependencies from telegram-bot/requirements.txt"
+      pip install -r "telegram-bot/requirements.txt"
+    - pip install pytest
+
+build:
+  stage: build
+  <<: *python_template
+  script:
+    - echo "Building project service-structure-template (language=python)"
+
+test:
+  stage: test
+  <<: *python_template
+  script:
+    - |
+      # Загружаем .env для тестов на основе анализа (analysis.env_files)
+      ENV_FILE=""
+      ENV_FILE=".env.gitlab"
+      if [ -n "$ENV_FILE" ] && [ -f "$ENV_FILE" ]; then
+        echo "Loading environment from $ENV_FILE"
+        set -a
+        # shellcheck disable=SC1090
+        source "$ENV_FILE"
+        set +a
+      else
+        echo "No suitable .env file found in repo; relying on GitLab CI variables"
+      fi
+
+      # Расширяем PYTHONPATH типичными src‑директориями для монорепо‑архитектур
+      SRC_PARENTS=$(find . -type d -name "src" -exec dirname {} \; | sort -u | tr '\n' ':')
+      if [ -n "$SRC_PARENTS" ]; then
+        export PYTHONPATH="$PYTHONPATH:$SRC_PARENTS"
+        echo "PYTHONPATH extended with: $SRC_PARENTS"
+      fi
+
+      # Настраиваем DATABASE_URL: сначала используем DATABASE_URI, потом SQLite‑фолбэк.
+      if [ -z "$DATABASE_URL" ]; then
+        if [ -n "$DATABASE_URI" ]; then
+          export DATABASE_URL="$DATABASE_URI"
+          echo "DATABASE_URL not set, using DATABASE_URI=$DATABASE_URI"
+        else
+          export DATABASE_URL="sqlite:///./test.db"
+          echo "DATABASE_URL not set, using SQLite fallback: $DATABASE_URL"
+        fi
+      else
+        echo "Using provided DATABASE_URL=$DATABASE_URL"
+      fi
+
+      # Запускаем юнит/интеграционные тесты, не трогая e2e.
+      if [ -d "tests/unit" ]; then
+        echo "Running unit tests from tests/unit"
+        pytest tests/unit -q || pytest tests/unit
+      elif [ -d "tests" ]; then
+        if [ -d "tests/e2e" ]; then
+          echo "Running tests (excluding tests/e2e)"
+          pytest tests --ignore=tests/e2e -q || pytest tests --ignore=tests/e2e
+        else
+          echo "Running tests/"
+          pytest tests -q || pytest tests
+        fi
+      else
+        echo "No tests directory found, running pytest on project root"
+        pytest -q || pytest
+      fi
+
+e2e:
+  stage: e2e
+  <<: *python_template
+  script:
+    - |
+      echo "Running e2e tests (tests/e2e); backend must be reachable"
+      if [ -d "tests/e2e" ]; then
+        pytest tests/e2e -q || pytest tests/e2e
+      else
+        echo "No tests/e2e directory found, skipping e2e tests"
+      fi
+  when: manual
+
+docker-build:
+  stage: docker-build
+  image: docker:stable
+
+  script:
+    - docker version
+    # Фаза 2: только сборка образа. Пуш в реестр добавим после настройки registry.
+    - docker build -t "service-structure-template:$CI_COMMIT_SHA" -f Dockerfile .
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  image: docker:stable
+  script:
+    - |
+      if [ -f "docker-compose.yml" ]; then
+        echo "Found docker-compose.yml, starting services..."
+        docker compose up -d
+      elif [ -f "docker-compose.yaml" ]; then
+        echo "Found docker-compose.yaml, starting services..."
+        docker compose -f docker-compose.yaml up -d
+      else
+        echo "No docker-compose file found. Please add the generated minimal docker-compose.yml to your repo."
+        exit 0
+      fi
+  only:
+    - main
+
