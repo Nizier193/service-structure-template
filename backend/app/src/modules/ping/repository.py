@@ -56,7 +56,6 @@ class PingRepository():
             return None
         
         logger.debug(f"Найдена запись: {ping}")
-        logger.debug(f"Найдена запись: {ping}")
         return ping.to_dict()
 
 

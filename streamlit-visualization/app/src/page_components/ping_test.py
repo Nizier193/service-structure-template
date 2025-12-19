@@ -3,6 +3,9 @@ import pandas as pd
 import plotly.express as px
 from datetime import datetime
 
+from core.logger import get_logger
+logger = get_logger("ping_test")
+
 from src.helpers.ping_api import (
     PingAPI, config
 )
@@ -11,6 +14,7 @@ api = PingAPI()
 
 def page_ping():
     st.text("Здесь можно проверить пинг и чекнуть статистику.")
+    logger.info("Ping test page loaded successfully")
 
     window = st.number_input(
         label="Количество записей", 
@@ -72,7 +76,7 @@ def page_ping():
                 hovermode='x unified'
             )
             
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig)
             
         else:
             st.warning("Нет данных для отображения статистики")
@@ -92,7 +96,6 @@ def page_ping():
         check = st.button(
             label="🚀 Отправить пинг", 
             key="btn_ping",
-            use_container_width=True
         )
 
         if check:

@@ -5,6 +5,7 @@ load_dotenv()
 
 class Config(BaseSettings):
     BACKEND_BASEURL: str
+    LOG_LEVEL: str
 
     class Config:
         env_file = ".env"

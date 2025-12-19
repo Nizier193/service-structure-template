@@ -11,6 +11,7 @@ class Config(BaseSettings):
     CACHE_PORT: int
 
     DATABASE_URI: str
+    LOG_LEVEL: str
 
     class Config:
         env_file = ".env"

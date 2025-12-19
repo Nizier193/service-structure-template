@@ -8,7 +8,8 @@ services:
     networks:
       - app-network
     volumes:
-      - ./streamlit-visualization/app:/app/app
+      # Монтируем приложение целиком, чтобы логи и код писались на хост
+      - ./streamlit-visualization/app:/app
 
   backend:
     build: ./backend
@@ -28,7 +29,8 @@ services:
     networks:
       - app-network
     volumes:
-      - ./telegram-bot/app:/app/app
+      # Монтируем приложение и директорию логов в хост
+      - ./telegram-bot/app:/app
     restart: always
 
   
@@ -51,7 +53,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_USER}
     networks:
       - app-network

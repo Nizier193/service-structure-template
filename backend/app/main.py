@@ -1,20 +1,23 @@
 import uvicorn
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from logging import config 
-from pathlib import Path
 
-# Инициализируем конфиг логов сразу
-config.fileConfig(Path(__file__).parent / "logger.ini")
-
+from core.logger import setup_logging, get_logger
 from src.head_router import router
-
 from core.cache import init_redis, close_redis
 from core.database import engine
 from core.database import close_db
 from core.config import config
-
 from src.modules.ping.schemas import Base
+
+# Инициализируем логирование (консоль + ротация файлов)
+setup_logging(
+    level=config.LOG_LEVEL
+)
+logger = get_logger("main")
+logger.debug("Starting with configuration:")
+for key, value in config.model_dump().items():
+    logger.debug(f"{key} = {value}")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

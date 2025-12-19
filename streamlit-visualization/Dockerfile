@@ -1,5 +1,8 @@
 FROM python:3.12-slim
 
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
 WORKDIR /app
 
 # Ставим зависимости
@@ -11,4 +14,4 @@ COPY . .
 
 # Открываем порт и запускаем
 EXPOSE 8501
-ENTRYPOINT ["python", "-m", "streamlit", "run", "app/main.py"]
+ENTRYPOINT ["python", "-m", "streamlit", "run", "main.py"]

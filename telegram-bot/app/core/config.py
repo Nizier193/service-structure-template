@@ -6,6 +6,7 @@ load_dotenv()
 class Config(BaseSettings):
     BACKEND_BASEURL: str
     TELEGRAM_TOKEN: str
+    LOG_LEVEL: str
 
     class Config:
         env_file = ".env"
