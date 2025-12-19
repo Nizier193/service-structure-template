@@ -7,16 +7,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.cache import get_cache
 from core.database import get_db
+from core.middleware.auth import get_current_user_id
 
 from .repository import PingRepository
 from .service import PingService
 
-# Логгер
 import logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
+# Обычный пинг, без привата
 @router.get("/ping")
 async def ping(
     db: AsyncSession = Depends(get_db),
@@ -40,6 +41,7 @@ async def ping(
 @router.get("/ping/single/{ping_id}")
 async def get_ping(
     ping_id: str,
+    user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
     cache: Redis = Depends(get_cache)
 ):
@@ -57,6 +59,7 @@ async def get_ping(
         )
 
     ping["cache"] = {"cached_ping": cache_ping}
+    ping["requested_by"] = user_id
 
     return JSONResponse(
         content=ping,
@@ -68,13 +71,18 @@ async def get_ping(
 async def get_ping_paginated(
     size: int = Query(default=10e10, gt=0),
     page: int = Query(default=1, gt=0),
+    user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db)
 ):
     repository = PingRepository(db)
     result = await repository.get_ping_paginated(size, page)
 
-    logger.info(f"Returned {len(result)} pings (page={page}, size={int(size)})")
+    logger.info(f"User {user_id} requested {len(result)} pings (page={page}, size={int(size)})")
     return JSONResponse(
-        content=result,
+        content={
+            "requested_by": user_id,
+            "pings": result,
+            "count": len(result)
+        },
         status_code=200
     )

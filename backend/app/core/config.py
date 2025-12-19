@@ -13,9 +13,10 @@ class Config(BaseSettings):
     DATABASE_URI: str
     LOG_LEVEL: str
     
-    # API Keys
-    SERVICE_API_KEY: str = "service-key-change-me"
-    ADMIN_API_KEY: str = "admin-key-change-me"
+    # JWT настройки
+    JWT_SECRET_KEY: str = "your-secret-key-change-me-in-production"
+    JWT_ALGORITHM: str = "HS256"
+    JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     class Config:
         env_file = ".env"

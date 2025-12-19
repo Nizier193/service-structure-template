@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
+from core.middleware.auth import JwtHandler
 
 from .models import UserRegister, UserLogin, UserResponse
 from .repository import AuthRepository
@@ -64,6 +65,7 @@ async def login_user(
 ):
     repository = AuthRepository(db)
     service = AuthService()
+    jwt_handler = JwtHandler()
     
     user = await repository.get_user_by_username(credentials.username)
     
@@ -93,11 +95,15 @@ async def login_user(
             status_code=403
         )
     
+    access_token = jwt_handler.create_access_token(user_id=user.id)
+    
     logger.info(f"User logged in successfully: {user.username}")
     
     return JSONResponse(
         content={
             "message": "Login successful",
+            "access_token": access_token,
+            "token_type": "bearer",
             "user": user.to_dict()
         },
         status_code=200
