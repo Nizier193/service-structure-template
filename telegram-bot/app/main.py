@@ -6,7 +6,7 @@ from src.head_router import initialize_routers
 setup_logging(
     level=config.LOG_LEVEL
 )
-logger = get_logger("main")
+logger = get_logger(__name__)
 logger.debug("Starting with configuration:")
 for key, value in config.model_dump().items():
     logger.debug(f"{key} = {value}")
