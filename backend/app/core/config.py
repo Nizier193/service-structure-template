@@ -12,6 +12,10 @@ class Config(BaseSettings):
 
     DATABASE_URI: str
     LOG_LEVEL: str
+    
+    # API Keys
+    SERVICE_API_KEY: str = "service-key-change-me"
+    ADMIN_API_KEY: str = "admin-key-change-me"
 
     class Config:
         env_file = ".env"

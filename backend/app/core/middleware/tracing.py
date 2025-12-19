@@ -104,9 +104,9 @@ class TracingMiddleware(BaseHTTPMiddleware):
     
     def get_log_level(self, status_code: int) -> int:
         if status_code >= 500:
-            return logging.ERROR
+            return logging.DEBUG
         elif status_code >= 400:
-            return logging.WARNING
+            return logging.DEBUG
         else:
             return logging.INFO
 

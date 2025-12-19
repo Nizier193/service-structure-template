@@ -8,3 +8,4 @@ redis
 
 sqlalchemy[asyncio]
 asyncpg
+bcrypt
