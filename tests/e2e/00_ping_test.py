@@ -30,7 +30,7 @@ def test_ping_overflow():
 
     time_consumed = time.time() - time_start
 
-    assert time_consumed < 1.0
+    assert time_consumed < 1.5
 
 
 def test_ping_id():

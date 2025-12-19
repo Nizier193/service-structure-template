@@ -28,7 +28,6 @@ async def ping(
     model = await repository.insert_ping()
     await service.set_ping(str(model.id))
 
-    logger.info(f"Got ping request {model.id}")
     return JSONResponse(
         content={
             "status": "Server is online",
@@ -51,12 +50,12 @@ async def get_ping(
     cache_ping = await service.get_ping(ping_id)
 
     if not ping:
+        logger.info(f"Ping not found: {ping_id}")
         return JSONResponse(
             content={"error": "not found"},
             status_code=404
         )
 
-    logger.info(f"Got ping search request {ping}")
     ping["cache"] = {"cached_ping": cache_ping}
 
     return JSONResponse(
@@ -74,7 +73,7 @@ async def get_ping_paginated(
     repository = PingRepository(db)
     result = await repository.get_ping_paginated(size, page)
 
-    logger.info(f"Got ping list request: len = {len(result)}")
+    logger.info(f"Returned {len(result)} pings (page={page}, size={int(size)})")
     return JSONResponse(
         content=result,
         status_code=200

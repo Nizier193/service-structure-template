@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
 from core.logger import setup_logging, get_logger
+from core.middleware.tracing import TracingMiddleware
 from src.head_router import router
 from core.cache import init_redis, close_redis
 from core.database import engine
@@ -33,6 +34,10 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+# Подключаем трассировку запросов
+app.add_middleware(TracingMiddleware)
+
 app.include_router(router)
 
 if __name__ == "__main__":

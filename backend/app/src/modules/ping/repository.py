@@ -18,44 +18,36 @@ class PingRepository():
         self.db = db
     
     async def insert_ping(self, text: str = ""):
-        new_uuid = str(uuid4()) # Новый айдишник
+        new_uuid = str(uuid4())
 
         model = PingConnectionsORM(
-            id = new_uuid,
-            text = text
+            id=new_uuid,
+            text=text
         )
-        
-        logger.debug(f"Пихаем ping в базу с ID={new_uuid}")
 
         self.db.add(model)
         await self.db.commit()
-        await self.db.refresh(model)  # Обновляем объект после коммита
+        await self.db.refresh(model)
 
-        
-        logger.debug(f"Запись с ID={new_uuid} добавлена")
         return model
 
 
-    # В качестве ID - UUID4
     async def get_ping_by_id(self, id: str) -> Optional[dict]:
         status = check_is_valid_uuid(id)
         if not status:
+            logger.debug(f"Invalid UUID format: {id}")
             return None
 
-        logger.debug(f"Ищем запись по id={id}")
         query = (
             select(PingConnectionsORM)
             .filter(PingConnectionsORM.id == id)
         )
         result = await self.db.execute(query)
-        logger.debug(f"result: {result}")
         ping = result.scalar_one_or_none()
 
         if not ping:
-            logger.debug(f"Запись не найдена: {ping}")
             return None
         
-        logger.debug(f"Найдена запись: {ping}")
         return ping.to_dict()
 
 
@@ -64,14 +56,13 @@ class PingRepository():
         
         query = (
             select(PingConnectionsORM)
-            .order_by(PingConnectionsORM.created_at.desc())  # Сортируем по времени создания (новые первыми)
+            .order_by(PingConnectionsORM.created_at.desc())
             .offset(offset)
             .limit(size)
         )
         result = await self.db.execute(query)
         pings = result.scalars().all()
 
-        logger.debug(f"Найдено всего: {len(pings)} ping-ов.")
+        logger.debug(f"Fetched {len(pings)} records (page={page}, limit={size})")
         
-        # Преобразуем в словари
         return [ping.to_dict() for ping in pings]
