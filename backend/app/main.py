@@ -9,8 +9,6 @@ from core.cache import init_redis, close_redis
 from core.database import engine
 from core.database import close_db
 from core.config import config
-from src.modules.ping.schemas import Base as PingBase
-from src.modules.auth.schemas import Base as AuthBase
 
 # Инициализируем логирование (консоль + ротация файлов)
 setup_logging(
@@ -24,10 +22,6 @@ for key, value in config.model_dump().items():
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_redis()
-    
-    async with engine.begin() as conn:
-        await conn.run_sync(PingBase.metadata.create_all)
-        await conn.run_sync(AuthBase.metadata.create_all)
 
     yield
 
